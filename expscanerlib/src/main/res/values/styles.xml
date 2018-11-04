@@ -1,0 +1,20 @@
+<resources>
+
+	<style
+	    name="app_theme"
+	    parent="android:Theme.NoTitleBar">
+		<item name="android:windowBackground">@drawable/app_background</item>
+	</style>
+	
+	<style name="customTheme" parent="android:Theme"> 
+        <item name="android:windowTitleBackgroundStyle">@style/WindowTitleBackground</item>   
+    </style>
+
+	<style name="WindowTitleBackground">
+        <item name="android:background">@color/titlebackgroundcolor</item>
+    </style>
+
+	<style name="AlertDialogCustom" parent="Theme.AppCompat.Light.Dialog.Alert">
+		<item name="colorAccent">#5ABCEC</item>
+	</style>
+</resources> 
