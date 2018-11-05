@@ -11,7 +11,6 @@ import com.mobilerecognition.engine.RecogResult;
 import com.mobilerecognition.phonenumer.R;
 import com.mobilerecognition.phonenumer.camera.CameraPreview;
 import com.mobilerecognition.phonenumer.general.CGlobal;
-import com.mobilerecognition.phonenumer.ui.ScanOldActivity;
 
 /* This class handles all the messaging which comprises the state machine for capture. */
 public final class ScanHandler extends Handler {

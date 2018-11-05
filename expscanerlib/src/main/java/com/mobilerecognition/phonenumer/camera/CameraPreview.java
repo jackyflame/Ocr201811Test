@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mobilerecognition.phonenumer.ui.ScanOldActivity;
+import com.mobilerecognition.phonenumer.ui.ScanActivity;
 import com.mobilerecognition.phonenumer.general.CGlobal;
 
 import android.app.Activity;
@@ -36,7 +36,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private static final String CAMERA_PARAM_PORTRAIT = "portrait";
 
     //protected Activity mActivity;
-    protected ScanOldActivity mActivity;
+    protected ScanActivity mActivity;
 
     private SurfaceHolder mHolder;
     public Camera mCamera;
@@ -88,7 +88,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     public CameraPreview(Activity activity, int cameraId, LayoutMode mode) {
         super(activity); // Always necessary
-        mActivity = (ScanOldActivity) activity;
+        mActivity = (ScanActivity) activity;
         mLayoutMode = mode;
         mHolder = getHolder();
         mHolder.addCallback(this);

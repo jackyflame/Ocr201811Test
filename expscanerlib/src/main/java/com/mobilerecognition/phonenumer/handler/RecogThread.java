@@ -1,11 +1,9 @@
 package com.mobilerecognition.phonenumer.handler;
 
-import java.util.concurrent.CountDownLatch;
-
 import android.os.Handler;
 import android.os.Looper;
 
-import com.mobilerecognition.phonenumer.ui.ScanOldActivity;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * This thread does all the heavy lifting of decoding the images.

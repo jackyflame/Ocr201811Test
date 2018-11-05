@@ -9,7 +9,6 @@ import android.os.Message;
 import android.util.Log;
 
 import com.mobilerecognition.phonenumer.R;
-import com.mobilerecognition.phonenumer.ui.ScanOldActivity;
 import com.mobilerecognition.phonenumer.general.CGlobal;
 import com.mobilerecognition.engine.RecogResult;
 
