@@ -13,12 +13,12 @@ import com.mobilerecognition.phonenumer.ui.ScanOldActivity;
 final class RecogThread extends Thread {
 
     public static final String RECOG_BITMAP = "recog_bitmap";
-    private final ScanOldActivity activity;
+    private final RecogListener recogListener;
     private Handler handler;
     private final CountDownLatch handlerInitLatch;
 
-    RecogThread(ScanOldActivity activity) {
-        this.activity = activity;
+    RecogThread(RecogListener recogListener) {
+        this.recogListener = recogListener;
         handlerInitLatch = new CountDownLatch(1);
     }
 
@@ -34,7 +34,7 @@ final class RecogThread extends Thread {
     @Override
     public void run() {
         Looper.prepare();
-        handler = new RecogHandler(activity);
+        handler = new RecogHandler(recogListener);
         handlerInitLatch.countDown();
         Looper.loop();
     }

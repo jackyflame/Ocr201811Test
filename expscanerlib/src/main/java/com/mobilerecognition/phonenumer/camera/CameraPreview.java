@@ -143,8 +143,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         //int hei = (int) ((width - gap * 2) * 45 / 100);
         //int marginTop = 0;
         int hei = (int) ((width - gap * 2) * 30 / 100);
-        int marginTop = 50;
-        CGlobal.g_rectPreview = new Rect(gap, gap + marginTop, width - gap, hei+ marginTop);
+        int marginTop = gap * 2;
+        CGlobal.g_rectPreview = new Rect(gap, gap + marginTop, width - gap, hei + marginTop);
         CGlobal.g_screenSize = new Point(width, height);
 
         mSurfaceChangedCallDepth++;
@@ -180,7 +180,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
             int gap = (int) (CGlobal.g_rectPreview.left * wrate);
             int hei = (int) ((mPreviewSize.height - gap * 2) * 45 / 100);
-            CGlobal.g_rectCrop = new Rect(gap, gap, mPreviewSize.height - gap, hei);
+            int marginTop = gap * 2;
+            CGlobal.g_rectCrop = new Rect(gap, gap + marginTop, mPreviewSize.height - gap, hei + marginTop);
 
             mActivity.setAndshowPreviewSize();
 
@@ -250,8 +251,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     /**
      * @param portrait
-     * @param reqWidth     must be the value of the parameter passed in surfaceChanged
-     * @param reqHeight    must be the value of the parameter passed in surfaceChanged
+     * @param reqWidth  must be the value of the parameter passed in surfaceChanged
+     * @param reqHeight must be the value of the parameter passed in surfaceChanged
      * @return Camera.Size object that is an element of the list returned from Camera.Parameters.getSupportedPreviewSizes.
      */
 
@@ -374,10 +375,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
         int layoutHeight = (int) (tmpLayoutHeight * fact);
         int layoutWidth = (int) (tmpLayoutWidth * (fact));
-        if(isBaseOnH){
-            layoutWidth = (int)(layoutHeight * ((float)availableWidth/(float)availableHeight));
-        }else{
-            layoutHeight = (int)(layoutWidth * ((float)availableHeight/(float)availableWidth));
+        if (isBaseOnH) {
+            layoutWidth = (int) (layoutHeight * ((float) availableWidth / (float) availableHeight));
+        } else {
+            layoutHeight = (int) (layoutWidth * ((float) availableHeight / (float) availableWidth));
         }
         if (DEBUGGING) {
             Log.v(LOG_TAG, "Preview Layout Size - w: " + layoutWidth + ", h: " + layoutHeight);
@@ -572,7 +573,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
         if (previewHandler != null) {
             //if (bIsAvailable == true && CGlobal.g_bAutoFocused && !bIsStateAutoFocusing)
-            if (mActivity.bIsAvailable == true)// && CGlobal.g_bAutoFocused && !bIsStateAutoFocusing)
+            if (mActivity.isAvailable() == true)// && CGlobal.g_bAutoFocused && !bIsStateAutoFocusing)
             {
                 //Log.d(LOG_TAG, " preview callback");
                 Message message = previewHandler.obtainMessage(previewMessage, nWidth, nHeight, arg0);

@@ -17,10 +17,10 @@ public final class RecogHandler extends Handler {
 
     private static final String TAG = RecogHandler.class.getSimpleName();
 
-    private final ScanOldActivity mActivity;
+    private final RecogListener recogListener;
 
-    RecogHandler(ScanOldActivity activity) {
-        this.mActivity = activity;
+    RecogHandler(RecogListener recogListener) {
+        this.recogListener = recogListener;
     }
 
     @Override
@@ -39,7 +39,7 @@ public final class RecogHandler extends Handler {
      * @param height: The height of the preview frame.
      */
     private void decode(byte[] data, int width, int height) {
-        mActivity.bIsAvailable = false;
+        recogListener.setIsAvailable(false);
         int rot = 90;
         long start = System.currentTimeMillis();
         Rect orgRect = CGlobal.getOrgCropRect(width, height, rot, CGlobal.g_rectCrop);
@@ -53,17 +53,17 @@ public final class RecogHandler extends Handler {
         if (rawResult.m_nResultCount == 2) {
             Log.d("RecogResult - ", rawResult.m_szNumber.toString());
             Bitmap recogBitmap = CGlobal.makeCropedGrayBitmap(data, width, height, rot, orgRect);
-            Message message = Message.obtain(mActivity.getHandler(), R.id.recog_succeeded, rawResult);
+            Message message = Message.obtain(recogListener.getHandler(), R.id.recog_succeeded, rawResult);
             Bundle bundle = new Bundle();
             bundle.putParcelable(CGlobal.PHONENUMBER_BITMAP, recogBitmap);
             message.setData(bundle);
             Log.d(TAG, "Sending recog succeeded message...");
             message.sendToTarget();
         } else {
-            Message message = Message.obtain(mActivity.getHandler(), R.id.recog_failed);
+            Message message = Message.obtain(recogListener.getHandler(), R.id.recog_failed);
             message.sendToTarget();
         }
-        mActivity.bIsAvailable = true;
+        recogListener.setIsAvailable(true);
     }
 
 }

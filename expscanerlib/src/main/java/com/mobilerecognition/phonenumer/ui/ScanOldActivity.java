@@ -14,35 +14,47 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Toast;
-import com.mobilerecognition.phonenumer.R;
+
 import com.mobilerecognition.engine.RecogEngine;
 import com.mobilerecognition.engine.RecogResult;
+import com.mobilerecognition.phonenumer.R;
 import com.mobilerecognition.phonenumer.camera.CameraPreview;
 import com.mobilerecognition.phonenumer.general.CGlobal;
+import com.mobilerecognition.phonenumer.handler.RecogListener;
 import com.mobilerecognition.phonenumer.handler.ScanHandler;
+import com.mobilerecognition.phonenumer.utils.CameraSetting;
 import com.mobilerecognition.phonenumer.utils.SoundClips;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class ScanOldActivity extends Activity implements OnClickListener {
+public abstract class ScanOldActivity extends Activity implements OnClickListener,RecogListener {
 
-	private static final String TAG = "ScanTestActivity";
-	private CameraPreview mCameraPreview;
-	private RelativeLayout mHomeLayout;
-	private Vibrator vibrator;
-	public ScanHandler m_scanHandler;
-	PowerManager.WakeLock wakeLock;
-	public boolean bIsAvailable;
+	protected static final String TAG = "ScanTestActivity";
+	protected CameraPreview mCameraPreview;
+	protected RelativeLayout mHomeLayout;
+	protected Vibrator vibrator;
+	protected ScanHandler m_scanHandler;
+	protected PowerManager.WakeLock wakeLock;
+	protected boolean bIsAvailable;
 
-	private long lastResultTime;
-	private long lastSuccessTime;
-	private String lastRecgResultString = null;
-	private SoundClips.Player mSoundPlayer;
+	protected long lastResultTime;
+	protected long lastSuccessTime;
+	protected String lastRecgResultString = null;
+
+	protected SoundClips.Player mSoundPlayer;
+	protected boolean isFlashOn = false;
+	protected ImageView iv_camera_back;
+	protected ImageView iv_camera_flash;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_scan_old);
+		iv_camera_back = findViewById(R.id.iv_camera_back);
+		iv_camera_back.setOnClickListener(this);
+		iv_camera_flash = findViewById(R.id.iv_camera_flash);
+		iv_camera_flash.setOnClickListener(this);
+
 
 		if (CGlobal.myEngine == null) {
 			CGlobal.myEngine = new RecogEngine();
@@ -81,7 +93,9 @@ public abstract class ScanOldActivity extends Activity implements OnClickListene
 
 		mSoundPlayer.play(SoundClips.PICTURE_BEGIN);
 
-		if (m_scanHandler == null) m_scanHandler = new ScanHandler(this, mCameraPreview);
+		if (m_scanHandler == null) {
+			m_scanHandler = new ScanHandler(this, mCameraPreview);
+		}
 		m_scanHandler.sendEmptyMessageDelayed(R.id.auto_focus, 1000);
 
 		if (wakeLock != null) wakeLock.acquire();
@@ -124,9 +138,8 @@ public abstract class ScanOldActivity extends Activity implements OnClickListene
 		Log.i(TAG, "窗口尺寸：" + strPreviewSize);
 	}
 
+	@Override
 	public void returnRecogedData(RecogResult result, Bitmap bmImage) {
-		// playBeepSoundAndVibrate();
-		if (vibrator != null) vibrator.vibrate(200L);
 		CGlobal.g_RecogResult = result;
 		CGlobal.g_bitmapPhoneNumber = bmImage;
 		String resultNum = CGlobal.MakePhoneNumberTypeString(result.m_szNumber);
@@ -136,6 +149,7 @@ public abstract class ScanOldActivity extends Activity implements OnClickListene
 			if(lastResultTime > 0 && (System.currentTimeMillis() - lastResultTime) < 1000*3){
 				Log.i(TAG,"3S内重复扫描无效");
 			}else if(isMobileNum(resultNum)){
+				if (vibrator != null) vibrator.vibrate(200L);
 				mSoundPlayer.play(SoundClips.PICTURE_COMPLETE);
 				resultHandle(resultNum,bmImage);
 				lastSuccessTime =  System.currentTimeMillis();
@@ -149,6 +163,7 @@ public abstract class ScanOldActivity extends Activity implements OnClickListene
 					Log.i(TAG,"1S内重复扫描屏蔽，防止重复扫描");
 				}else{
 					mSoundPlayer.play(SoundClips.PICTURE_COMPLETE);
+					if (vibrator != null) vibrator.vibrate(200L);
 					resultHandle(resultNum,bmImage);
 					lastSuccessTime =  System.currentTimeMillis();
 					lastResultTime = System.currentTimeMillis();
@@ -160,15 +175,46 @@ public abstract class ScanOldActivity extends Activity implements OnClickListene
 	}
 
 	@Override
-	public void onClick(View arg0) {
-		if (mCameraPreview != null) {
-			mCameraPreview.autoCameraFocuse();
+	public void recogedFailed() {
+		if(isScanOutTime()){
+			outTimeWarning();
+		}
+	}
+
+	@Override
+	public void onClick(View v) {
+		if (v.getId() == R.id.iv_camera_back) {
+			this.finish();
+		} else if (v.getId() == R.id.iv_camera_flash) {
+			if (isFlashOn == false) {
+				refreshFlashIcon(!isFlashOn);
+				CameraSetting.getInstance(this).openCameraFlash(mCameraPreview.mCamera);
+			} else {
+				refreshFlashIcon(!isFlashOn);
+				CameraSetting.getInstance(this).closedCameraFlash(mCameraPreview.mCamera);
+			}
+		}else{
+			if (mCameraPreview != null) {
+				mCameraPreview.autoCameraFocuse();
+			}
 		}
 	}
 
 	private void restartScan(){
 		bIsAvailable = true;
 		m_scanHandler.sendEmptyMessage(R.id.restart_preview);
+	}
+
+	/**
+	 * 刷新闪光灯开关
+	 * */
+	protected void refreshFlashIcon(boolean isOn){
+		isFlashOn = isOn;
+		if(isFlashOn == false){
+			iv_camera_flash.setImageResource(R.drawable.flash_on);
+		}else{
+			iv_camera_flash.setImageResource(R.drawable.flash_off);
+		}
 	}
 
 	/**
@@ -202,10 +248,19 @@ public abstract class ScanOldActivity extends Activity implements OnClickListene
 	protected abstract void outTimeWarning();
 
 	protected boolean isScanOutTime(){
-		if((System.currentTimeMillis() - lastSuccessTime) > 1000*60*2){
+		if(lastSuccessTime > 0 && (System.currentTimeMillis() - lastSuccessTime) > 1000*60*2){
 			return true;
 		}
 		return false;
 	}
 
+	@Override
+	public boolean isAvailable() {
+		return bIsAvailable;
+	}
+
+	@Override
+	public void setIsAvailable(boolean isAvailable) {
+		bIsAvailable = isAvailable;
+	}
 }

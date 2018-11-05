@@ -356,7 +356,7 @@ public abstract class ScanActivity extends AppCompatActivity implements Camera.P
 
     public void returnRecogedData(RecogResult result, Bitmap bmImage) {
         // playBeepSoundAndVibrate();
-//        if (vibrator != null) vibrator.vibrate(200L);
+        //if (vibrator != null) vibrator.vibrate(200L);
         CGlobal.g_RecogResult = result;
         CGlobal.g_bitmapPhoneNumber = bmImage;
         String resultNum = CGlobal.MakePhoneNumberTypeString(result.m_szNumber);

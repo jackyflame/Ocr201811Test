@@ -1,10 +1,7 @@
 
 package com.mobilerecognition.phonenumer.handler;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -12,26 +9,26 @@ import android.util.Log;
 
 import com.mobilerecognition.engine.RecogResult;
 import com.mobilerecognition.phonenumer.R;
-import com.mobilerecognition.phonenumer.ui.ScanOldActivity;
 import com.mobilerecognition.phonenumer.camera.CameraPreview;
 import com.mobilerecognition.phonenumer.general.CGlobal;
+import com.mobilerecognition.phonenumer.ui.ScanOldActivity;
 
 /* This class handles all the messaging which comprises the state machine for capture. */
 public final class ScanHandler extends Handler {
 
     private static final String TAG = ScanHandler.class.getSimpleName();
 
-    private final ScanOldActivity mActivity;
+    private final RecogListener recogListener;
     private final CameraPreview mCameraPreview;
     private final RecogThread decodeThread;
     private State state;
 
     private enum State {PREVIEW, SUCCESS, DONE}
 
-    public ScanHandler(ScanOldActivity activity, CameraPreview cameraPreview) {
-        this.mActivity = activity;
+    public ScanHandler(RecogListener recogListener, CameraPreview cameraPreview) {
+        this.recogListener = recogListener;
         this.mCameraPreview = cameraPreview;
-        decodeThread = new RecogThread(activity);
+        decodeThread = new RecogThread(recogListener);
         decodeThread.start();
         state = State.SUCCESS;
 
@@ -47,6 +44,7 @@ public final class ScanHandler extends Handler {
             //	mCameraPreview.requestAutoFocus(this, R.id.auto_focus);
             //}
             mCameraPreview.autoCameraFocuse();
+            sendEmptyMessageDelayed(R.id.auto_focus,1500);
         } else if (message.what == R.id.restart_preview) {
             Log.d(TAG, "Got restart preview message");
             restartPreviewAndDecode();
@@ -55,20 +53,11 @@ public final class ScanHandler extends Handler {
             state = State.SUCCESS;
             Bundle bundle = message.getData();
             Bitmap bmImage = bundle == null ? null : (Bitmap) bundle.getParcelable(CGlobal.PHONENUMBER_BITMAP);//
-            mActivity.returnRecogedData((RecogResult) message.obj, bmImage);//
+            recogListener.returnRecogedData((RecogResult) message.obj, bmImage);//
         } else if (message.what == R.id.recog_failed) {// We're decoding as fast as possible, so when one decode fails, start another.
             state = State.PREVIEW;
             mCameraPreview.requestPreviewFrame(decodeThread.getHandler(), R.id.recog_start);
-        } else if (message.what == R.id.return_scan_result) {
-            Log.d(TAG, "Got return scan result message");
-            mActivity.setResult(Activity.RESULT_OK, (Intent) message.obj);
-            mActivity.finish();
-        } else if (message.what == R.id.launch_product_query) {
-            Log.d(TAG, "Got product query message");
-            String url = (String) message.obj;
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-            mActivity.startActivity(intent);
+            recogListener.recogedFailed();
         }
     }
 
@@ -93,7 +82,7 @@ public final class ScanHandler extends Handler {
             state = State.PREVIEW;
             mCameraPreview.requestPreviewFrame(decodeThread.getHandler(), R.id.recog_start);
             //mCameraPreview.requestAutoFocus(this, R.id.auto_focus);
-            //this.sendEmptyMessageDelayed(R.id.auto_focus, 1500);
+            //this.sendEmptyMessageDelayed(R.id.auto_focus, 1000);
         }
     }
 
