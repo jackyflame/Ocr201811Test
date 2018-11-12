@@ -143,9 +143,9 @@ public abstract class ScanActivity extends Activity implements OnClickListener,R
 		CGlobal.g_RecogResult = result;
 		CGlobal.g_bitmapPhoneNumber = bmImage;
 		String resultNum = CGlobal.MakePhoneNumberTypeString(result.m_szNumber);
-		Log.i(TAG,"------------->>>resultNum:"+resultNum);
+		Log.i(TAG,"------------->>>resultNum:"+resultNum+" lstNum:"+lastRecgResultString);
 		//识别结果过滤
-		if (result.equals(lastRecgResultString)) {
+		if (resultNum.equals(lastRecgResultString)) {
 			if(lastResultTime > 0 && (System.currentTimeMillis() - lastResultTime) < 1000*3){
 				Log.i(TAG,"3S内重复扫描无效");
 			}else if(isMobileNum(resultNum)){

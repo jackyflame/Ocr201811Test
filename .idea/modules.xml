@@ -3,10 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Ocr201811Test.iml" filepath="$PROJECT_DIR$/Ocr201811Test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Ocr201811Test.iml" filepath="$PROJECT_DIR$/Ocr201811Test.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/expscanerlib/expscanerlib.iml" filepath="$PROJECT_DIR$/expscanerlib/expscanerlib.iml" />
       <module fileurl="file://$PROJECT_DIR$/expscanerlib/expscanerlib.iml" filepath="$PROJECT_DIR$/expscanerlib/expscanerlib.iml" />
     </modules>
   </component>

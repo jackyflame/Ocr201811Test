@@ -179,7 +179,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             double wrate = (double) mPreviewSize.width / CGlobal.g_screenSize.y;
 
             int gap = (int) (CGlobal.g_rectPreview.left * wrate);
-            int hei = (int) ((mPreviewSize.height - gap * 2) * 45 / 100);
+            int hei = (int) ((mPreviewSize.height - gap * 2) * 30 / 100);
             int marginTop = gap * 2;
             CGlobal.g_rectCrop = new Rect(gap, gap + marginTop, mPreviewSize.height - gap, hei + marginTop);
 
