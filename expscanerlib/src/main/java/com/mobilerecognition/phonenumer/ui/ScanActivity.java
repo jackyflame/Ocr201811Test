@@ -146,7 +146,7 @@ public abstract class ScanActivity extends Activity implements OnClickListener,R
 		Log.i(TAG,"------------->>>resultNum:"+resultNum+" lstNum:"+lastRecgResultString);
 		//识别结果过滤
 		if (resultNum.equals(lastRecgResultString)) {
-			if(lastResultTime > 0 && (System.currentTimeMillis() - lastResultTime) < 1000*3){
+			if(lastSuccessTime > 0 && (System.currentTimeMillis() - lastSuccessTime) < 1000*3){
 				Log.i(TAG,"3S内重复扫描无效");
 			}else if(isMobileNum(resultNum)){
 				if (vibrator != null) vibrator.vibrate(200L);
@@ -159,17 +159,17 @@ public abstract class ScanActivity extends Activity implements OnClickListener,R
 		} else {
 			if(isMobileNum(resultNum)){
 				//1S间隔以内重复扫描，视为无效扫描
-				if((System.currentTimeMillis() - lastResultTime) < 1000*1){
+				if((System.currentTimeMillis() - lastSuccessTime) < 1000*1){
 					Log.i(TAG,"1S内重复扫描屏蔽，防止重复扫描");
 				}else{
 					mSoundPlayer.play(SoundClips.PICTURE_COMPLETE);
 					if (vibrator != null) vibrator.vibrate(200L);
 					resultHandle(resultNum,bmImage);
 					lastSuccessTime =  System.currentTimeMillis();
-					lastResultTime = System.currentTimeMillis();
-					lastRecgResultString = resultNum;
 				}
-			}
+                lastResultTime = System.currentTimeMillis();
+                lastRecgResultString = resultNum;
+            }
 		}
 		restartScan();
 	}
